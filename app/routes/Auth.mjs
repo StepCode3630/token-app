@@ -1,7 +1,4 @@
 import express from "express";
-
-// Il manque l'import du module jwt
-
 import {connectToDatabase} from "../utils/dbUtils.mjs";
 
 
@@ -22,16 +19,18 @@ const connectToDatabaseMiddleware = async (req, res, next) => {
 router.post('/', connectToDatabaseMiddleware, async (req, res) => {
     const {username, password} = req.body;
 
-    const queryString = 'SELECT * FROM t_users WHERE useName = ? AND usePassword = ?';
+    const queryString = `SELECT *
+                         FROM t_users
+                         WHERE useName = '${username}'
+                           AND usePassword = '${password}'`;
 
     try {
-        const [rows] = await req.dbConnection.execute(queryString, [username, password]);
+        const [rows] = await req.dbConnection.query(queryString, [username, password]);
         if (rows.length > 0) {
 
             // signer et renvoyer votre token ici (utiliser un code http de succès)
 
-
-            res.status(401).json({error: "Renvoi du token pas implémenté"});
+            res.status(200).json({message: "Authentication successful"});
         } else {
             res.status(401).json({error: "Invalid username or password"});
         }
